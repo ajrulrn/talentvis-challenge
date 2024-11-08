@@ -5,6 +5,7 @@
             <div class="flex flex-column" style="flex-wrap: wrap;">
                 <label for="amount" class="block">Amount</label>
                 <input type="text" class="form-control" id="amount" name="amount" autofocus autocomplete="off">
+                <small class="text-danger"><?= $this->getFlashData('deposit') ?></small>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
