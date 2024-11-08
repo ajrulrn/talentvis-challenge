@@ -20,3 +20,14 @@
     ```
     php -S localhost:8000 -t public
     ```
+    
+## Credentials
+```
+username: feon
+password: 123456789
+
+// or
+
+username: vira
+password: 123456789
+```
