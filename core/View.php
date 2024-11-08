@@ -37,6 +37,11 @@ class View
         include($viewPath);
     }
 
+    public function getSession($name)
+    {
+        return $_SESSION[$name] ?: null;
+    }
+
     public function getFlashData($name)
     {
         $flashName = $name . '_flash';

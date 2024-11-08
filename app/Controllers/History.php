@@ -10,6 +10,10 @@ class History extends Controller
 
     public function __construct()
     {
+        if (!$this->isAuthenticated()) {
+            return $this->redirect('/login');
+        }
+
         $this->transactionModel = $this->model('Transaction');
     }
 
@@ -17,7 +21,7 @@ class History extends Controller
     {
         $data = [
             'title' => 'History',
-            'transactions' => $this->transactionModel->getTransactions()
+            'transactions' => $this->transactionModel->getTransactionsByUserId($this->getSession('user')->id)
         ];
 
         $this->view('history', $data);

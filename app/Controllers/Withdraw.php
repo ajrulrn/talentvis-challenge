@@ -7,6 +7,13 @@ use Error;
 
 class Withdraw extends Controller
 {
+    public function __construct()
+    {
+        if (!$this->isAuthenticated()) {
+            return $this->redirect('/login');
+        }
+    }
+
     public function index()
     {
         $data = [
@@ -28,7 +35,7 @@ class Withdraw extends Controller
                 throw new Error('only number allowed');
             }
 
-            $this->model('Transaction')->withdraw($amount);
+            $this->model('Transaction')->withdraw($this->getSession('user')->id, $amount);
         } catch (\Throwable $e) {
             $this->setFlashData('withdraw', $e->getMessage());
             return $this->redirect('/withdraw');

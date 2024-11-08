@@ -11,6 +11,10 @@ class Deposit extends Controller
 
     public function __construct()
     {
+        if (!$this->isAuthenticated()) {
+            return $this->redirect('/login');
+        }
+
         $this->transactionModel = $this->model('Transaction');
     }
 
@@ -35,7 +39,7 @@ class Deposit extends Controller
                 throw new Error('only number allowed');
             }
 
-            $this->transactionModel->deposit($amount);
+            $this->transactionModel->deposit($this->getSession('user')->id, $amount);
         } catch (\Exception $e) {
             $this->setFlashData('deposit', $e->getMessage());
             return $this->redirect('/deposit');

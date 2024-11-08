@@ -15,50 +15,27 @@ class Transaction
         $this->db = new Database;
     }
 
-    public function getTransactions()
+    public function getTransactionsByUserId($userId)
     {
-        $this->db->query("SELECT * FROM {$this->table} ORDER BY created_at DESC");
+        $this->db->query("SELECT * FROM {$this->table} WHERE user_id = :userId ORDER BY created_at DESC");
+        $this->db->bind(':userId', $userId);
         return $this->db->get();
     }
 
-    public function deposit($amount)
+    public function deposit($userId, $amount)
     {
         try {
             $this->db->beginTransaction();
-            $balance = $this->getBalance();
+            $balance = $this->getBalanceByUserId($userId);
             $finalBalance = $amount + $balance;
-    
+
             $data = [
+                'userId' => $userId,
                 'category' => 'Deposit',
                 'type' => 'Debit',
                 'amount' => $amount,
-                'balance' => $finalBalance
-            ];
-    
-            $this->create($data);
-            $this->db->commit();
-        } catch (\PDOException $e) {
-            $this->db->rollback();
-            throw $e;
-        }
-    }
-
-    public function withdraw($amount)
-    {
-        try {
-            $this->db->beginTransaction();
-            $balance = $this->getBalance();
-            $finalBalance = $balance - $amount;
-    
-            if ($finalBalance < 0) {
-                throw new Error('Your balance is insufficient');
-            }
-    
-            $data = [
-                'category' => 'Withdraw',
-                'type' => 'Credit',
-                'amount' => $amount,
-                'balance' => $finalBalance
+                'balance' => $finalBalance,
+                'note' => null
             ];
 
             $this->create($data);
@@ -69,9 +46,36 @@ class Transaction
         }
     }
 
-    public function getBalance()
+    public function withdraw($userId, $amount)
     {
-        $this->db->query("SELECT balance FROM {$this->table} ORDER BY created_at DESC");
+        $balance = $this->getBalanceByUserId($userId);
+        $finalBalance = $balance - $amount;
+
+        if ($finalBalance < 0) {
+            throw new Error('Your balance is insufficient');
+        }
+
+        $data = [
+            'userId' => $userId,
+            'category' => 'Withdraw',
+            'type' => 'Credit',
+            'amount' => $amount,
+            'balance' => $finalBalance,
+            'note' => null
+        ];
+        return $this->create($data);
+    }
+
+    public function getBalanceByUserId($userId, $forUpdate = false)
+    {
+        $query = "SELECT balance FROM {$this->table} WHERE user_id = :userId ORDER BY created_at DESC";
+        
+        if ($forUpdate) {
+            $query .= ' FOR UPDATE';
+        }
+
+        $this->db->query($query);
+        $this->db->bind(':userId', $userId);
         $result = $this->db->first();
         $balance = 0;
 
@@ -84,11 +88,13 @@ class Transaction
 
     public function create($data)
     {
-        $this->db->query("INSERT INTO {$this->table} (category, type, amount, balance) VALUES(:category, :type, :amount, :balance)");
+        $this->db->query("INSERT INTO {$this->table} (user_id, category, type, amount, balance, note) VALUES(:userId, :category, :type, :amount, :balance, :note)");
+        $this->db->bind(':userId', $data['userId']);
         $this->db->bind(':category', $data['category']);
         $this->db->bind(':type', $data['type']);
         $this->db->bind(':amount', $data['amount']);
         $this->db->bind(':balance', $data['balance']);
+        $this->db->bind(':note', $data['note']);
         return $this->db->execute();
     }
 }

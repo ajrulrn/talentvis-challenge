@@ -21,6 +21,11 @@ class Controller
         return new $modelClass();
     }
 
+    protected function isAuthenticated()
+    {
+        return isset($_SESSION['user']);
+    }
+
     public function redirect($url)
     {
         $redirectUrl = APP_URL . $url;
@@ -30,6 +35,17 @@ class Controller
     public function setSession($name, $data)
     {
         $_SESSION[$name] = $data;
+    }
+
+    public function getSession($name)
+    {
+        return $_SESSION[$name] ?: null;
+    }
+
+    public function clearSession()
+    {
+        session_unset();
+        session_destroy();
     }
 
     public function setFlashData($name, $message)

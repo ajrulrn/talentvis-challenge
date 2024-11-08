@@ -10,6 +10,10 @@ class Balance extends Controller
 
     public function __construct()
     {
+        if (!$this->isAuthenticated()) {
+            return $this->redirect('/login');
+        }
+
         $this->transactionModel = $this->model('Transaction');
     }
 
@@ -17,7 +21,7 @@ class Balance extends Controller
     {
         $data = [
             'title' => 'Balance',
-            'balance' =>  $this->transactionModel->getBalance()
+            'balance' =>  $this->transactionModel->getBalanceByUserId($this->getSession('user')->id)
         ];
         $this->view('balance', $data);
     }
