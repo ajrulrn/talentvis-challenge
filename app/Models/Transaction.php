@@ -86,6 +86,46 @@ class Transaction
         return $balance;
     }
 
+    public function transfer($amount, $sender, $recipient)
+    {
+        try {
+            $this->db->beginTransaction();
+            $senderBalance = $this->getBalanceByUserId($sender->id, true);
+    
+            if ($amount > $senderBalance) {
+                throw new Error('Your balance is insufficient');
+            }
+    
+            $recipientBalance = $this->getBalanceByUserId($recipient->id, true);
+            $finalSenderBalance = $senderBalance - $amount;
+            $finalRecipientBalance = $recipientBalance + $amount;
+    
+            $insertSenderData = [
+                'userId' => $sender->id,
+                'category' => 'Transfer',
+                'type' => 'Credit',
+                'amount' => $amount,
+                'balance' => $finalSenderBalance,
+                'note' => 'Transfer to ' . $recipient->name
+            ];
+            $this->create($insertSenderData);
+    
+            $insertRecipientData = [
+                'userId' => $recipient->id,
+                'category' => 'Transfer',
+                'type' => 'Debit',
+                'amount' => $amount,
+                'balance' => $finalRecipientBalance,
+                'note' => 'Transfer from ' . $sender->name
+            ];
+            $this->create($insertRecipientData);
+            $this->db->commit();
+        } catch (\PDOException $e) {
+            $this->db->rollback();
+            throw $e;
+        }
+    }
+
     public function create($data)
     {
         $this->db->query("INSERT INTO {$this->table} (user_id, category, type, amount, balance, note) VALUES(:userId, :category, :type, :amount, :balance, :note)");

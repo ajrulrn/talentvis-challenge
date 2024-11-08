@@ -8,7 +8,7 @@
                 <p><?= date('H:i', strtotime($item->created_at)) ?></p>
             </div>
             <div>
-                <p style="font-size: 16pt;"><?= $item->category ?></p>
+                <p style="font-size: 16pt;"><?= $item->note ?: $item->category ?></p>
                 <p><?= $item->type; ?></p>
             </div>
         </div>

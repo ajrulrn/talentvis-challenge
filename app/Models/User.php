@@ -20,6 +20,13 @@ class User {
         return $this->db->first();
     }
 
+    public function getRecipients($id)
+    {
+        $this->db->query("SELECT * FROM {$this->table} WHERE NOT id = :id");
+        $this->db->bind(':id', $id);
+        return $this->db->get();
+    }
+
     public function getUserByUsername($username)
     {
         $this->db->query("SELECT * FROM {$this->table} WHERE username = :username");

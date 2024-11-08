@@ -8,6 +8,9 @@
             <a href="/withdraw" class="btn btn-light block" style="font-size: 18pt;">Withdraw</a>
         </li>
         <li style="margin-bottom: 1rem;">
+            <a href="/transfer" class="btn btn-light block" style="font-size: 18pt;">Transfer</a>
+        </li>
+        <li style="margin-bottom: 1rem;">
             <a href="/balance" class="btn btn-light block" style="font-size: 18pt;">Check Balance</a>
         </li>
         <li>
