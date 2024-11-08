@@ -36,7 +36,7 @@ class Deposit extends Controller
             }
 
             $this->transactionModel->deposit($amount);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->setFlashData('deposit', $e->getMessage());
             return $this->redirect('/deposit');
         }
