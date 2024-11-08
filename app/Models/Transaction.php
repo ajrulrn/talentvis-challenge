@@ -15,6 +15,12 @@ class Transaction
         $this->db = new Database;
     }
 
+    public function getTransactions()
+    {
+        $this->db->query("SELECT * FROM {$this->table} ORDER BY created_at DESC");
+        return $this->db->get();
+    }
+
     public function deposit($amount)
     {
         try {
